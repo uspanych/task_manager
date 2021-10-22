@@ -10,7 +10,7 @@ PRIORITY_CHOICES = (
 )
 TYPE_CHOICES = (
     ('BUG', 'bug'),
-    ('TACK', 'tack')
+    ('TASK', 'task')
 )
 STATUS_CHOICES = (
     ('to_do', 'To do'),
@@ -40,7 +40,7 @@ class User(models.Model):
         return self.login
 
 
-class Tacks(models.Model):
+class Task(models.Model):
     title = models.CharField(
         max_length=20,
         verbose_name='Заголовок'
