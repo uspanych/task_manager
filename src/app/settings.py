@@ -21,12 +21,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-wm!%-$tzq6$qe8ilwru_s)c%l41^&7$-607clw21z175g2w&92'
+JWT_SECRET = '9XLpbdf6jVaMA8p_CuVLOkkMUpPS0tz-ekbvgZm8s_E' #Возможно ошибка
+JWT_ALGORITHM = 'HS256'#Возможно ошибка
+JWT_EXPIRATION = 3600
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '0.0.0.0',
+    '127.0.0.1',
 ]
 
 
@@ -39,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'app'
+    'app',
+
 
 ]
 

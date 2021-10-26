@@ -2,3 +2,7 @@ fastapi~=0.70.0
 Django~=3.2.8
 starlette~=0.16.0
 uvicorn~=0.15.0
+python-jose
+passlib[bcrypt]
+python-multipart
+pydantic

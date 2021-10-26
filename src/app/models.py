@@ -2,39 +2,10 @@ from django.db import models
 from django.db.models import Model
 
 
-PRIORITY_CHOICES = (
-    ('CRITICAL', 'critical'),
-    ('HIGH', 'high'),
-    ('MEDIUM', 'medium'),
-    ('LOW', 'low')
-)
-TYPE_CHOICES = (
-    ('BUG', 'bug'),
-    ('TASK', 'task')
-)
-STATUS_CHOICES = (
-    ('to_do', 'To do'),
-    ('In_progress', 'In progress'),
-    ('Code_review', 'Code review'),
-    ('Dev_test', "Dev test"),
-    ('Testing', 'Testing'),
-    ('Done', 'Done'),
-    ('Wontfix', 'Wontfix')
-)
-
-
-RoleChoices = (
-    ('manager', 'Менеджер'),
-    ('teamlead', 'Тимлид'),
-    ('developer', 'Разработчик'),
-    ('test_engineer', 'Тест-инженер'),
-)
-
-
 class User(models.Model):
-    login = models.CharField(verbose_name='Логин', unique=True, max_length=20)
-    password = models.CharField(max_length=20)
-    role = models.CharField(max_length=20, choices=RoleChoices, null=True, blank=True)
+    login = models.CharField(verbose_name='Логин', unique=True, max_length=256)
+    password = models.CharField(max_length=256)
+    role = models.CharField(max_length=20, null=True, blank=True)
 
     def __str__(self):
         return self.login
@@ -47,18 +18,15 @@ class Task(models.Model):
     )
     status = models.CharField(
         max_length=20, db_index=True,
-        choices=STATUS_CHOICES,
         verbose_name='Статус'
     )
     type = models.CharField(
         max_length=20,
-        choices=TYPE_CHOICES,
         verbose_name='Тип'
     )
     priority = models.CharField(
         max_length=20,
         db_index=True,
-        choices=PRIORITY_CHOICES,
         blank=True,
         verbose_name='Приоритет'
     )
@@ -75,9 +43,9 @@ class Task(models.Model):
     creator = models.ForeignKey(
         User,
         verbose_name='Создатель',
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
+        on_delete=models.CASCADE,
+        blank=False,
+        null=False,
         related_name='creator'
     )
     date_of_creation = models.DateField(
