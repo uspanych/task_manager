@@ -54,9 +54,9 @@ def get_task(
          }
          )
 def get_task_title(
-        user=Depends(auth_handler.user_getter),
-        task_title: str = Query(None),
-                   ) -> tp.List[schemas.TaskSchema]:
+    user=Depends(auth_handler.user_getter),
+    task_title: str = Query(None),
+    ) -> tp.List[schemas.TaskSchema]:
     result = models.Task.objects.filter(title=task_title).order_by('-date_of_change')
     return [schemas.TaskSchema.from_model(task) for task in result]
 
@@ -71,6 +71,9 @@ def create_task(
     user=Depends(auth_handler.user_getter),
     task: schemas.TaskCreateSchema = Body(...)
 ) -> schemas.TaskSchema:
+    task_executor = models.User.objects.get(id=task.executor_id)
+    if task_executor.role == 'manager':
+        raise HTTPException(status_code=405, detail='A manager cannot be a performer')
     created_tack = models.Task.objects.create(
         title=task.title,
         status=task.status,
@@ -79,7 +82,7 @@ def create_task(
         description=task.description,
         executor_id=task.executor_id,
         creator=user,
-    )
+        )
     return schemas.TaskSchema.from_model(created_tack)
 
 
@@ -93,6 +96,9 @@ def update_task(
         task_id: int = Query(...),
         task: schemas.TaskCreateSchema = Body(...)
 ) -> schemas.TaskSchema:
+    task_executor = models.User.objects.get(id=task.executor_id)
+    if task_executor.role == 'manager':
+        raise HTTPException(status_code=405, detail='A manager cannot be a performer')
     task_to_update = models.Task.objects.get(id=task_id)
     task_to_update.title = task.title
     task_to_update.status = task.status
@@ -109,6 +115,8 @@ def delete_task(
     user=Depends(auth_handler.user_getter),
     task_id: int = Query(...),
 ):
+    if user.role != 'manager':
+        raise HTTPException(status_code=403)
     try:
         query = models.Task.objects.get(pk=task_id)
         query.delete()
@@ -137,3 +145,25 @@ def login(auth_details: UserCreateSchema):
         raise HTTPException(status_code=401, detail='Invalid username and/or password')
     token = auth_handler.encode_token(user.login)
     return {'token': token}
+
+
+@api.put(
+    '/manager',
+    responses={
+        200: {'model': schemas.TaskSchema},
+     }
+    )
+def update_role_and_login(
+        user=Depends(auth_handler.user_getter),
+        manager_changes: schemas.UserSchema = Body(...)
+        ) -> schemas.UserSchema:
+    if user.role != 'manager':
+        raise HTTPException(status_code=403)
+    user_for_change = models.User.objects.get(id=manager_changes.id)
+    user_for_change.login = manager_changes.login
+    user_for_change.role = manager_changes.role
+    user_for_change.save()
+    return schemas.UserSchema.from_model(user_for_change)
+
+
+

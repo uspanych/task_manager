@@ -13,7 +13,7 @@ class User(models.Model):
 
 class Task(models.Model):
     title = models.CharField(
-        max_length=20,
+        max_length=250,
         verbose_name='Заголовок'
     )
     status = models.CharField(
