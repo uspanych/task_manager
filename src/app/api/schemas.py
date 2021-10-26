@@ -57,7 +57,7 @@ class TaskSchema(BaseModel):
     status: str = Field(..., description='Статус')
     type: str = Field(..., description='Тип')
     priority: str = Field(description='Приоритет')
-    description: tp.Optional[str] = Field(None, description='Описание')  
+    description: tp.Optional[str] = Field(None, description='Описание')
     executor: tp.Optional[UserSchema]
     creator: tp.Optional[UserSchema]
     date_of_creation: datetime.date

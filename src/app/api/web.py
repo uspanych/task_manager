@@ -47,6 +47,20 @@ def get_task(
     return schemas.TaskSchema.from_model(task)
 
 
+@api.get('/task_title/{task_title}',
+         summary='Поиск по заголовку',
+         responses={
+             200: {'model': schemas.TaskSchema},
+         }
+         )
+def get_task_title(
+        user=Depends(auth_handler.user_getter),
+        task_title: str = Query(None),
+                   ) -> tp.List[schemas.TaskSchema]:
+    result = models.Task.objects.filter(title=task_title).order_by('-date_of_change')
+    return [schemas.TaskSchema.from_model(task) for task in result]
+
+
 @api.post(
     '/tasks',
     responses={
@@ -79,7 +93,7 @@ def update_task(
         task_id: int = Query(...),
         task: schemas.TaskCreateSchema = Body(...)
 ) -> schemas.TaskSchema:
-    task_to_update = models.Task.objects.get(id=task_id)  # TODO:  try: ... except ...
+    task_to_update = models.Task.objects.get(id=task_id)
     task_to_update.title = task.title
     task_to_update.status = task.status
     task_to_update.type = task.type
