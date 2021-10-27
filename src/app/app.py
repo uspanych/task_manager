@@ -3,7 +3,7 @@ import django
 
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app.settings')
-django.setup() #подгружаем настройки
+django.setup()
 
 
 from fastapi import FastAPI
@@ -16,10 +16,10 @@ from django.conf import settings
 
 app = FastAPI()
 
-app.mount('/app', get_asgi_application()) #хостим через uvicorn
+app.mount('/app', get_asgi_application()) #хостим через uvicorn не работает админка
 app.mount(
     settings.STATIC_URL,
-    app=StaticFiles(directory=settings.STATIC_ROOT.as_posix(), check_dir=False),
+    app=StaticFiles(directory=settings.STATIC_ROOT.as_posix(), check_dir=False), #Не грузит статику
     name='staticfiles',
 )
 app.mount('/api/v1/', api_subapp)

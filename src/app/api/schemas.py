@@ -71,7 +71,7 @@ class TaskSchema(BaseModel):
             status=model.status,
             type=model.type,
             priority=model.priority,
-            descriprion=model.description,
+            description=model.description,
             executor=UserSchema.from_model(model.executor) if model.executor is not None else None,
             creator=UserSchema.from_model(model.creator),
             date_of_creation=model.date_of_creation,

@@ -31,7 +31,9 @@ class Task(models.Model):
         verbose_name='Приоритет'
     )
     description = models.TextField(
-        verbose_name='Описание'
+        verbose_name='Описание',
+        blank=True,
+        null=True,
     )
     executor = models.ForeignKey(
         User,

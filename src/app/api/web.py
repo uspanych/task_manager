@@ -7,7 +7,7 @@ from . import schemas
 from .auth import AuthHandler
 from .schemas import UserCreateSchema
 from django.db import IntegrityError
-from django.db import transaction
+
 
 
 api = FastAPI()
@@ -24,7 +24,7 @@ auth_handler = AuthHandler()
 def get_tasks(
     user=Depends(auth_handler.user_getter),
 ) -> tp.List[schemas.TaskSchema]:
-    result = models.Task.objects.all()
+    result = models.Task.objects.all().order_by('id')
     return [schemas.TaskSchema.from_model(task) for task in result]
 
 
@@ -56,7 +56,7 @@ def get_task(
 def get_task_title(
     user=Depends(auth_handler.user_getter),
     task_title: str = Query(None),
-    ) -> tp.List[schemas.TaskSchema]:
+) -> tp.List[schemas.TaskSchema]:
     result = models.Task.objects.filter(title=task_title).order_by('-date_of_change')
     return [schemas.TaskSchema.from_model(task) for task in result]
 
@@ -141,7 +141,7 @@ def login(auth_details: UserCreateSchema):
         if x.login == auth_details.login:
             user = x
             break
-    if (user is None) or (not auth_handler.verify_password(auth_details.password, user.password)):#user or users?
+    if (user is None) or (not auth_handler.verify_password(auth_details.password, user.password)): #Если не работает, то ошибка тут
         raise HTTPException(status_code=401, detail='Invalid username and/or password')
     token = auth_handler.encode_token(user.login)
     return {'token': token}
@@ -150,7 +150,7 @@ def login(auth_details: UserCreateSchema):
 @api.put(
     '/manager',
     responses={
-        200: {'model': schemas.TaskSchema},
+        200: {'model': schemas.UserSchema},
      }
     )
 def update_role_and_login(
