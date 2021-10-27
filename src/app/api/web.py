@@ -9,7 +9,6 @@ from .schemas import UserCreateSchema
 from django.db import IntegrityError
 
 
-
 api = FastAPI()
 
 auth_handler = AuthHandler()
@@ -74,6 +73,10 @@ def create_task(
     task_executor = models.User.objects.get(id=task.executor_id)
     if task_executor.role == 'manager':
         raise HTTPException(status_code=405, detail='A manager cannot be a performer')
+    if task_executor.role == 'test engineer' and task.status == ('in_progress' or 'code_review' or 'dev_test'):
+        raise HTTPException(status_code=405, detail='A test engineer cannot be a performer')
+    if task_executor.role == 'developer' and task.status == 'testing':
+        raise HTTPException(status_code=405, detail='A developer cannot be a performer')
     created_tack = models.Task.objects.create(
         title=task.title,
         status=task.status,
@@ -99,6 +102,10 @@ def update_task(
     task_executor = models.User.objects.get(id=task.executor_id)
     if task_executor.role == 'manager':
         raise HTTPException(status_code=405, detail='A manager cannot be a performer')
+    if task_executor.role == 'test engineer' and task.status == ('in_progress' or 'code_review' or 'dev_test'):
+        raise HTTPException(status_code=405, detail='A test engineer cannot be a performer')
+    if task_executor.role == 'developer' and task.status == 'testing':
+        raise HTTPException(status_code=405, detail='A developer cannot be a performer')
     task_to_update = models.Task.objects.get(id=task_id)
     task_to_update.title = task.title
     task_to_update.status = task.status
